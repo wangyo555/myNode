@@ -1,24 +1,39 @@
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
+// 程序入口
 
-http.createServer(function(request, response) {
+// 引入模块
+var http = require('http'); // 处理url请求
+var url = require('url'); // 解析请求参数和路径
+var fs = require('fs'); // 用来读取静态文件
+var path = require('path'); // 用来匹配路径的扩展名
 
-    var pathname = url.parse(request.url).pathname;
-    console.log('Request for ' + pathname + 'receieved.');
+
+http.createServer(function(req, res) {
+
+    var param = url.parse(req.url, true).query; // 获取url的查询参数
+    var pathname = url.parse(req.url).pathname; // 获取url的路径
+
+    if (pathname === '' || pathname === '/') {
+        pathname = '/index.html';
+    }
+
+    // 不允许请求其他路径的文件
+
+
+
+    console.log('req for ' + pathname + 'receieved.');
 
     fs.readFile(pathname.substr(1), function(err, data) {
         if (err) {
             console.log(err);
-            response.writeHead(400, { 'Content-Type': 'text/html' });
+            res.writeHead(400, { 'Content-Type': 'text/html' });
         } else {
-            response.writeHead(200, { 'Content-Type': 'text/plain' });
-            response.write('Hello world.');
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.write('Hello world.');
             // console.log(data.toString())
         }
     });
 
-    response.end();
+    res.end();
 }).listen(8808);
 
 console.log('Server running at http://127.0.0.1:8808/');
