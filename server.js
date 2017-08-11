@@ -7,33 +7,37 @@ var fs = require('fs'); // 用来读取静态文件
 var path = require('path'); // 用来匹配路径的扩展名
 
 
-http.createServer(function(req, res) {
-
-    var param = url.parse(req.url, true).query; // 获取url的查询参数
-    var pathname = url.parse(req.url).pathname; // 获取url的路径
-
+// 创建服务器
+http.createServer(function(request, response) {
+    // 解析请求，包括文件名
+    var param = url.parse(request.url).query; // 解析请求的参数
+    var pathname = url.parse(request.url).pathname; // 解析请求的路径
     if (pathname === '' || pathname === '/') {
         pathname = '/index.html';
     }
 
-    // 不允许请求其他路径的文件
+    // 输出请求的文件名
+    console.log("Request for " + pathname + " received.");
 
-
-
-    console.log('req for ' + pathname + 'receieved.');
-
+    // 从文件系统中读取请求的文件内容
     fs.readFile(pathname.substr(1), function(err, data) {
         if (err) {
             console.log(err);
-            res.writeHead(400, { 'Content-Type': 'text/html' });
+            // HTTP 状态码: 404 : NOT FOUND
+            // Content Type: text/plain
+            response.writeHead(404, { 'Content-Type': 'text/html' });
         } else {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write('Hello world.');
-            // console.log(data.toString())
+            // HTTP 状态码: 200 : OK
+            // Content Type: text/plain
+            response.writeHead(200, { 'Content-Type': 'text/html' });
+
+            // 响应文件内容
+            response.write(data.toString());
         }
+        //  发送响应数据
+        response.end();
     });
+}).listen(8081);
 
-    res.end();
-}).listen(8808);
-
-console.log('Server running at http://127.0.0.1:8808/');
+// 控制台会输出以下信息
+console.log('Server running at http://127.0.0.1:8081/');
